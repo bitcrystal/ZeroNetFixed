@@ -9,8 +9,8 @@ import ConfigParser
 class Config(object):
 
     def __init__(self, argv):
-        self.version = "0.6.1"
-        self.rev = 3230
+        self.version = "0.6.0"
+        self.rev = 3179
         self.argv = argv
         self.action = None
         self.config_file = "zeronet.conf"
@@ -173,13 +173,13 @@ class Config(object):
 
         action = self.subparsers.add_parser("getConfig", help='Return json-encoded info')
         action = self.subparsers.add_parser("testConnection", help='Testing')
-        action = self.subparsers.add_parser("testAnnounce", help='Testing')
 
         # Config parameters
         self.parser.add_argument('--verbose', help='More detailed logging', action='store_true')
         self.parser.add_argument('--debug', help='Debug mode', action='store_true')
         self.parser.add_argument('--silent', help='Disable logging to terminal output', action='store_true')
         self.parser.add_argument('--debug_socket', help='Debug socket connections', action='store_true')
+        self.parser.add_argument('--debug_gevent', help='Debug gevent functions', action='store_true')
 
         self.parser.add_argument('--batch', help="Batch mode (No interactive input for commands)", action='store_true')
 
@@ -195,14 +195,18 @@ class Config(object):
 
         self.parser.add_argument('--open_browser', help='Open homepage in web browser automatically',
                                  nargs='?', const="default_browser", metavar='browser_name')
-        self.parser.add_argument('--homepage', help='Web interface Homepage', default='1HeLLo4uzjaLetFx6NH3PMwFP3qbRbTf3D',
+       # self.parser.add_argument('--homepage', help='Web interface Homepage', default='1HeLLo4uzjaLetFx6NH3PMwFP3qbRbTf3D',
+        #                         metavar='address')
+        self.parser.add_argument('--homepage', help='Web interface Homepage', default='1Jwmx33xCtuRe2UReHHxkritZ1nfuyXrrc',
                                  metavar='address')
-        self.parser.add_argument('--updatesite', help='Source code update site', default='1UPDatEDxnvHDo7TXvq6AEBARfNkyfxsp',
+
+        #self.parser.add_argument('--updatesite', help='Source code update site', default='1UPDatEDxnvHDo7TXvq6AEBARfNkyfxsp',
+        #                         metavar='address')
+        self.parser.add_argument('--updatesite', help='Source code update site', default='1KVLauCV3Ag9ZPry9cr1WvKQcyaev8gG2m',
                                  metavar='address')
         self.parser.add_argument('--size_limit', help='Default site size limit in MB', default=10, type=int, metavar='limit')
         self.parser.add_argument('--file_size_limit', help='Maximum per file size limit in MB', default=10, type=int, metavar='limit')
         self.parser.add_argument('--connected_limit', help='Max connected peer per site', default=8, type=int, metavar='connected_limit')
-        self.parser.add_argument('--global_connected_limit', help='Max connections', default=512, type=int, metavar='global_connected_limit')
         self.parser.add_argument('--workers', help='Download workers per site', default=5, type=int, metavar='workers')
 
         self.parser.add_argument('--fileserver_ip', help='FileServer bind address', default="*", metavar='ip')
@@ -244,6 +248,18 @@ class Config(object):
         self.parser.add_argument('--tor_proxy', help='Tor proxy address', metavar='ip:port', default='127.0.0.1:9050')
         self.parser.add_argument('--tor_password', help='Tor controller password', metavar='password')
         self.parser.add_argument('--tor_hs_limit', help='Maximum number of hidden services', metavar='limit', type=int, default=10)
+
+
+        self.parser.add_argument('--i2p', help='enable: Use only for i2p peers, always: Use I2P for every connection', choices=["disable", "enable", "always"], default='enable')
+        self.parser.add_argument('--i2p_start', help='I2P start', metavar='i2p_start', type='bool', choices=[True, False], default=False)
+        self.parser.add_argument('--i2p_socks_proxy', help='I2P socks proxy address', metavar='ip:port', default='127.0.0.1:1080')
+        self.parser.add_argument('--i2p_http_proxy', help='I2P proxy address', metavar='ip:port', default='127.0.0.1:4444') 
+        self.parser.add_argument('--i2p_bob_server', help='I2P BOB server address', metavar='ip:port', default='127.0.0.1:2827')
+        self.parser.add_argument('--i2p_cookiefile_path', help='I2P Cookiefile Path', metavar='cookiefile_path', default='/myservices/tor/control_auth_cookie')
+        self.parser.add_argument('--i2p_controller', help='I2P controller address', metavar='i2p_ip:i2p_port', default='127.0.0.1:1234')
+        self.parser.add_argument('--i2p_port_range_faktor', help='I2P port_range_faktor', metavar='i2p_port_range_faktor', type=int, default=10)
+        self.parser.add_argument('--i2p_debug', help='I2P debug', metavar='i2p_debug', type='bool', choices=[True, False], default=False)
+        self.parser.add_argument('--i2p_hs_limit', help='Maximum number of hidden services', metavar='i2p_limit', type=int, default=10)
 
         self.parser.add_argument('--version', action='version', version='ZeroNet %s r%s' % (self.version, self.rev))
         self.parser.add_argument('--end', help='Stop multi value argument parsing', action='store_true')
@@ -362,6 +378,7 @@ class Config(object):
                         for line in val.strip().split("\n"):  # Allow multi-line values
                             argv.insert(1, line)
                     argv.insert(1, "--%s" % key)
+        print argv
         return argv
 
     # Expose arguments as class attributes
