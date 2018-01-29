@@ -426,7 +426,7 @@ class BigFile(object):
 
     def read(self, buff=64 * 1024):
         pos = self.f.tell()
-        read_until = min(self.size, pos + buff)
+        read_until = pos + buff
         requests = []
         # Request all required blocks
         while 1:
@@ -690,3 +690,4 @@ class ConfigPlugin(object):
         group.add_argument('--autodownload_bigfile_size_limit', help='Also download bigfiles until this limit if help distribute option is checked', default=1, metavar="MB", type=int)
 
         return super(ConfigPlugin, self).createArguments()
+    
