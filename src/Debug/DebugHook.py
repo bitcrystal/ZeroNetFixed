@@ -34,8 +34,7 @@ def handleError(*args):
         return
     if not silent and args[0].__name__ != "Notify":
         logging.exception("Unhandled exception")
-        if "greenlet.py" not in args[2].tb_frame.f_code.co_filename:  # Don't display error twice
-            sys.__excepthook__(*args)
+        sys.__excepthook__(*args)
 
 
 # Ignore notify errors
